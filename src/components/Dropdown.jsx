@@ -38,6 +38,7 @@ const Dropdown = (props) => {
 							<label htmlFor="pie">Label</label>
 							<select
 								id="pie"
+								value={props.labelColumn}
 								onChange={(e) => {
 									props.setLableColumn(e.target.value);
 								}}
@@ -52,6 +53,7 @@ const Dropdown = (props) => {
 						<div className="chart">
 							<label htmlFor="chart">Value</label>
 							<select
+								value={props.valueColumn}
 								id="chart"
 								onChange={(e) => {
 									props.setValueColumn(e.target.value);
@@ -70,6 +72,7 @@ const Dropdown = (props) => {
 					<div className="chart">
 						<label htmlFor="chartxy">Label</label>
 						<select
+							value={props.labelColumn}
 							id="chartxy"
 							onChange={(e) => {
 								props.setLableColumn(e.target.value);
