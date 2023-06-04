@@ -1,5 +1,6 @@
 import React from "react";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
+
 
 const Dropdown = (props) => {
 	const listOption = [
@@ -14,6 +15,22 @@ const Dropdown = (props) => {
 		{
 			key: "chartxy",
 			name: "chartxy",
+		},
+		{
+			key: "histogram",
+			name: "histogram",
+		},
+		{
+			key: "area",
+			name: "area",
+		},
+		{
+			key: "networkChart",
+			name: "networkChart",
+		},
+		{
+			key: "heatmap",
+			name: "heatmap",
 		},
 	];
 
@@ -31,20 +48,21 @@ const Dropdown = (props) => {
 						</option>
 					))}
 				</select>
-				{(props.selectedOptionKey === "pie" ||
-					props.selectedOptionKey === "columnchart") && (
+				{(	props.selectedOptionKey === "pie" ||
+					props.selectedOptionKey === "columnchart" ||
+					props.selectedOptionKey === "area" ) && (
 					<>
 						<div className="chart">
-							<label htmlFor="pie">Label</label>
+							<label htmlFor="chart">Label</label>
 							<select
-								id="pie"
+								id="chart"
 								value={props.labelColumn}
 								onChange={(e) => {
 									props.setLableColumn(e.target.value);
 								}}
 							>
 								{props.listInput.map((item) => (
-									<option value={item} key={uuidv4()}>
+									<option value={item} >
 										{item}
 									</option>
 								))}
@@ -60,7 +78,7 @@ const Dropdown = (props) => {
 								}}
 							>
 								{props.listInput.map((item) => (
-									<option value={item} key={uuidv4()}>
+									<option value={item} >
 										{item}
 									</option>
 								))}
@@ -68,28 +86,82 @@ const Dropdown = (props) => {
 						</div>
 					</>
 				)}
-				{props.selectedOptionKey === "chartxy" && (
+				{(props.selectedOptionKey === "chartxy" || props.selectedOptionKey === "histogram" )&& (
 					<div className="chart">
-						<label htmlFor="chartxy">Label</label>
+						<label htmlFor="chartxy">Value</label>
 						<select
-							value={props.labelColumn}
+							value={props.valueColumn}
 							id="chartxy"
 							onChange={(e) => {
-								props.setLableColumn(e.target.value);
+								props.setValueColumn(e.target.value);
 							}}
 						>
 							{props.listInput.map((item) => (
-								<option value={item} key={uuidv4()}>
+								<option value={item} >
 									{item}
 								</option>
 							))}
 						</select>
 					</div>
 				)}
+				{props.selectedOptionKey === "heatmap"  && (
+					<>
+						<div className="chart">
+							<label htmlFor="pie">group</label>
+							<select
+								id="pie"
+								value={props.groupColumn}
+								onChange={(e) => {
+									props.setGroupColumn(e.target.value);
+								}}
+							>
+								{props.listInput.map((item) => (
+									<option value={item} >
+										{item}
+									</option>
+								))}
+							</select>
+						</div>
+						<div className="chart">
+							<label htmlFor="pie">Label</label>
+							<select
+								id="pie"
+								value={props.labelColumn}
+								onChange={(e) => {
+									props.setLableColumn(e.target.value);
+								}}
+							>
+								{props.listInput.map((item) => (
+									<option value={item} >
+										{item}
+									</option>
+								))}
+							</select>
+						</div>
+						<div className="chart">
+							<label htmlFor="chart">Value</label>
+							<select
+								value={props.valueColumn}
+								id="chart"
+								onChange={(e) => {
+									props.setValueColumn(e.target.value);
+								}}
+							>
+								{props.listInput.map((item) => (
+									<option value={item} >
+										{item}
+									</option>
+								))}
+							</select>
+						</div>
+					</>
+				)}
 			</div>
+			
 			<button onClick={() => props.exportData()}>SHOW</button>
 		</div>
 	);
 };
+
 
 export default Dropdown;
