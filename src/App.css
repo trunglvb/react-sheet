@@ -1,17 +1,18 @@
 
 .wrapper {
-  /* display: flex; */
+  display: flex;
   gap: 10px;
 }
 
 .dropdown {
   width: 400px;
-  height: 400px;
-  margin-top: 40px;
-  margin-bottom: 40px;
+  height: 300px;
   border: 5px dashed silver;
 }
 
+.tabs{
+  margin: 5px;
+}
 
 .selectList {
   width: 100%;
@@ -51,4 +52,9 @@ option {
   height: 800px;
   background: whitesmoke;
   border: 2px dotted sienna;
+}
+
+#optionList{
+  max-width: 300px;
+  
 }

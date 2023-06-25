@@ -25,10 +25,6 @@ const Dropdown = (props) => {
 			name: "area",
 		},
 		{
-			key: "networkChart",
-			name: "networkChart",
-		},
-		{
 			key: "heatmap",
 			name: "heatmap",
 		},

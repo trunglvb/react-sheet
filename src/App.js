@@ -1,13 +1,13 @@
 import { DataSheetGrid, textColumn, keyColumn } from "react-datasheet-grid";
 import { useState } from "react";
 import "react-datasheet-grid/dist/style.css";
-import { Tabs } from "antd";
+import { Tabs  } from "antd";
 import Dropdown from "./components/Dropdown";
 import * as d3 from "d3";
 // import math from "mathjs";
 // import Plotly from 'plotly.js-dist'
 import "./App.css";
-import { string } from "mathjs";
+import { i, string } from "mathjs";
 
 const App = () => {
 	const [data, setData] = useState([{}, {}, {}, {}]);
@@ -80,9 +80,7 @@ const App = () => {
 				let area = [];
 				for (let i = 0; i < dataFilter.length; i++) {
 					let chartObj = {
-						date: d3.timeParse("%Y-%m-%d")(
-							String(dataFilter[i][String(labelColumn)])
-						),
+						date: String(dataFilter[i][String(labelColumn)]),
 						value: Number(dataFilter[i][String(valueColumn)]),
 					};
 					area.push(chartObj);
@@ -114,20 +112,41 @@ const App = () => {
 		{ ...keyColumn("U", textColumn), title: "U" },
 	];
 
+	const listOption = [
+		{
+			key: "pie",
+			name: "pie",
+		},
+		{
+			key: "columnchart",
+			name: "columnchart",
+		},
+		{
+			key: "chartxy",
+			name: "chartxy",
+		},
+		{
+			key: "histogram",
+			name: "histogram",
+		},
+		{
+			key: "area",
+			name: "area",
+		},
+		{
+			key: "heatmap",
+			name: "heatmap",
+		},
+	];
+
 	const listInput = dataFilter.map((item) => Object.keys(item)).flat();
+	
 	const items = [
 		{
 			key: "1",
-			label: `Tab 1`,
+			label: `Export from Table`,
 			children: (
 				<div className="wrapper">
-					<div className="sheet">
-						<DataSheetGrid
-							value={data}
-							onChange={(data) => setData(data)}
-							columns={columns}
-						/>
-					</div>
 					<div className="flex">
 						<div className="dropdown">
 							<Dropdown
@@ -142,31 +161,110 @@ const App = () => {
 							/>
 						</div>
 
-						<div className="data-chart" id="data-chart"></div>
 					</div>
+					<div className="sheet">
+						<DataSheetGrid
+							value={data}
+							onChange={(data) => setData(data)}
+							columns={columns}
+						/>
+					</div>
+
 				</div>
 			),
 		},
 		{
 			key: "2",
-			label: `Tab 2`,
-			children: `Content of Tab Pane 2`,
+			label: `Export from JSON `,
+			children: (
+				<div>
+					<div>
+					<select
+						className="selectList"
+						id="optionList"
+						onChange={(e) => setSelectedOptionKey(e.target.value)}
+					>
+						{listOption.map((item) => (
+							<option value={item.key} key={item.key}>
+								{item.name}
+							</option>
+						))}
+					</select>
+						<input type="file" id="jsonFileInput" accept=".json"></input>
+					
+						<button onClick={() => handleFile(selectedOptionKey)}>Read JSON File</button>
+					</div>
+										
+				</div>
+			),
 		},
 		{
 			key: "3",
-			label: `Tab 3`,
-			children: `Content of Tab Pane 3`,
+			label: `Graphic editor`,
+			children: (
+				<div>
+					<div>Node</div>
+					<div>Link</div>
+				</div>
+			),
 		},
 	];
 
-	return <Tabs defaultActiveKey="1" items={items} />;
+	return (
+	<div>
+		<Tabs className="tabs" defaultActiveKey="1" items={items} />
+		<div className="data-chart" id="data-chart"></div>
+	</div>
+		
+		);
 };
+
+function handleFile(selectedOptionKey) {
+	const fileInput = document.getElementById('jsonFileInput');
+	const file = fileInput.files[0];
+  
+	if (file) {
+	  const reader = new FileReader();
+	  const parentElement = document.getElementById("data-chart");
+		parentElement.innerHTML = "";
+	  reader.onload = function (event) {
+		const jsonData = event.target.result;
+		const parsedData = JSON.parse(jsonData);
+  
+		// Process the parsed JSON data here
+		console.log(parsedData,selectedOptionKey);
+
+		switch (selectedOptionKey){
+			case "pie":
+				plotPieChart(parsedData);
+				break;
+			case "columnchart":
+				plotColumnChart(parsedData);
+				break;
+			case "heatmap":
+				plotHeatmap(parsedData);
+				break;
+			case "histogram":
+				plotHistogram(parsedData);
+				break;
+			case "area":
+				plotAreaChart(parsedData);
+				break;
+			default:
+				break;
+		}
+	  };
+  
+	  reader.readAsText(file);
+	}
+  }
+  
 
 // pie
 function plotPieChart(data) {
 	// set the dimensions and margins of the graph
-	let width = 500;
-	let height = 500;
+	let width = 800;
+	let height = 800;
 	let margin = 40;
 
 	// The radius of the pieplot is half the width or half the height (smallest one). I subtract a bit of margin.
@@ -226,8 +324,8 @@ function plotPieChart(data) {
 function plotColumnChart(data) {
 	// set the dimensions and margins of the graph
 	let margin = { top: 30, right: 30, bottom: 70, left: 60 };
-	let width = 500 - margin.left - margin.right;
-	let height = 500 - margin.top - margin.bottom;
+	let width = 800 - margin.left - margin.right;
+	let height = 800 - margin.top - margin.bottom;
 
 	// append the svg object to the body of the page
 	let svg = d3
@@ -412,10 +510,15 @@ function plotHeatmap(data) {
 
 // Area
 function plotAreaChart(data) {
+
+	data.map(item => {
+		item.date =  d3.timeParse("%Y-%m-%d")(item.date) 
+	})
+	
 	// set the dimensions and margins of the graph
 	const margin = { top: 10, right: 30, bottom: 30, left: 50 },
-		width = 460 - margin.left - margin.right,
-		height = 400 - margin.top - margin.bottom;
+		width = 800 - margin.left - margin.right,
+		height = 600 - margin.top - margin.bottom;
 
 	// append the svg object to the body of the page
 	const svg = d3
@@ -487,6 +590,8 @@ function plotAreaChart(data) {
 		.attr("cx", (d) => x(d.date))
 		.attr("cy", (d) => y(d.value))
 		.attr("r", 3);
+
+	  
 }
 
 // histogram
