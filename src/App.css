@@ -56,5 +56,14 @@ option {
 
 #optionList{
   max-width: 300px;
-  
+
+}
+.table-sheet{
+  display: flex;
+  gap: 30px;
+  justify-content: flex-end;
+}
+
+.table-sheet input {
+  width: 280px;
 }

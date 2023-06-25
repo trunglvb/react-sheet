@@ -1,7 +1,7 @@
 import { DataSheetGrid, textColumn, keyColumn } from "react-datasheet-grid";
 import { useState } from "react";
 import "react-datasheet-grid/dist/style.css";
-import { Tabs  } from "antd";
+import { Tabs } from "antd";
 import Dropdown from "./components/Dropdown";
 import * as d3 from "d3";
 // import math from "mathjs";
@@ -20,6 +20,7 @@ const App = () => {
 
 	const [selectedOptionKey, setSelectedOptionKey] = useState("pie");
 	const [list, setList] = useState([]);
+	const [isShowTable, setIsShowTable] = useState(false);
 	const exportData = () => {
 		console.log("selectedOptionKey", selectedOptionKey);
 		console.log("dataFilter", dataFilter);
@@ -140,7 +141,7 @@ const App = () => {
 	];
 
 	const listInput = dataFilter.map((item) => Object.keys(item)).flat();
-	
+
 	const items = [
 		{
 			key: "1",
@@ -160,7 +161,6 @@ const App = () => {
 								selectedOptionKey={selectedOptionKey}
 							/>
 						</div>
-
 					</div>
 					<div className="sheet">
 						<DataSheetGrid
@@ -169,7 +169,6 @@ const App = () => {
 							columns={columns}
 						/>
 					</div>
-
 				</div>
 			),
 		},
@@ -179,22 +178,32 @@ const App = () => {
 			children: (
 				<div>
 					<div>
-					<select
-						className="selectList"
-						id="optionList"
-						onChange={(e) => setSelectedOptionKey(e.target.value)}
-					>
-						{listOption.map((item) => (
-							<option value={item.key} key={item.key}>
-								{item.name}
-							</option>
-						))}
-					</select>
-						<input type="file" id="jsonFileInput" accept=".json"></input>
-					
-						<button onClick={() => handleFile(selectedOptionKey)}>Read JSON File</button>
+						<select
+							className="selectList"
+							id="optionList"
+							onChange={(e) =>
+								setSelectedOptionKey(e.target.value)
+							}
+						>
+							{listOption.map((item) => (
+								<option value={item.key} key={item.key}>
+									{item.name}
+								</option>
+							))}
+						</select>
+						<input
+							type="file"
+							id="jsonFileInput"
+							accept=".json"
+						></input>
+
+						<button onClick={() => setIsShowTable(!isShowTable)}>
+							Addvace
+						</button>
+						<button onClick={() => handleFile(selectedOptionKey)}>
+							Read JSON File
+						</button>
 					</div>
-										
 				</div>
 			),
 		},
@@ -211,54 +220,59 @@ const App = () => {
 	];
 
 	return (
-	<div>
-		<Tabs className="tabs" defaultActiveKey="1" items={items} />
-		<div className="data-chart" id="data-chart"></div>
-	</div>
-		
-		);
+		<div>
+			<Tabs className="tabs" defaultActiveKey="1" items={items} />
+			<div className="data-chart" id="data-chart">
+				{isShowTable && (
+					<div className="table-sheet">
+						<input type="text" />
+						<button>ShowGraphic</button>
+					</div>
+				)}
+			</div>
+		</div>
+	);
 };
 
 function handleFile(selectedOptionKey) {
-	const fileInput = document.getElementById('jsonFileInput');
+	const fileInput = document.getElementById("jsonFileInput");
 	const file = fileInput.files[0];
-  
-	if (file) {
-	  const reader = new FileReader();
-	  const parentElement = document.getElementById("data-chart");
-		parentElement.innerHTML = "";
-	  reader.onload = function (event) {
-		const jsonData = event.target.result;
-		const parsedData = JSON.parse(jsonData);
-  
-		// Process the parsed JSON data here
-		console.log(parsedData,selectedOptionKey);
 
-		switch (selectedOptionKey){
-			case "pie":
-				plotPieChart(parsedData);
-				break;
-			case "columnchart":
-				plotColumnChart(parsedData);
-				break;
-			case "heatmap":
-				plotHeatmap(parsedData);
-				break;
-			case "histogram":
-				plotHistogram(parsedData);
-				break;
-			case "area":
-				plotAreaChart(parsedData);
-				break;
-			default:
-				break;
-		}
-	  };
-  
-	  reader.readAsText(file);
+	if (file) {
+		const reader = new FileReader();
+		const parentElement = document.getElementById("data-chart");
+		parentElement.innerHTML = "";
+		reader.onload = function (event) {
+			const jsonData = event.target.result;
+			const parsedData = JSON.parse(jsonData);
+
+			// Process the parsed JSON data here
+			console.log(parsedData, selectedOptionKey);
+
+			switch (selectedOptionKey) {
+				case "pie":
+					plotPieChart(parsedData);
+					break;
+				case "columnchart":
+					plotColumnChart(parsedData);
+					break;
+				case "heatmap":
+					plotHeatmap(parsedData);
+					break;
+				case "histogram":
+					plotHistogram(parsedData);
+					break;
+				case "area":
+					plotAreaChart(parsedData);
+					break;
+				default:
+					break;
+			}
+		};
+
+		reader.readAsText(file);
 	}
-  }
-  
+}
 
 // pie
 function plotPieChart(data) {
@@ -510,11 +524,10 @@ function plotHeatmap(data) {
 
 // Area
 function plotAreaChart(data) {
+	data.map((item) => {
+		item.date = d3.timeParse("%Y-%m-%d")(item.date);
+	});
 
-	data.map(item => {
-		item.date =  d3.timeParse("%Y-%m-%d")(item.date) 
-	})
-	
 	// set the dimensions and margins of the graph
 	const margin = { top: 10, right: 30, bottom: 30, left: 50 },
 		width = 800 - margin.left - margin.right,
@@ -590,8 +603,6 @@ function plotAreaChart(data) {
 		.attr("cx", (d) => x(d.date))
 		.attr("cy", (d) => y(d.value))
 		.attr("r", 3);
-
-	  
 }
 
 // histogram
